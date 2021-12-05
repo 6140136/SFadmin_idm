@@ -1,0 +1,67 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  - name: Install nginx on RedHat Family
+    yum:
+     name=nginx
+     state=latest
+    when:
+     ansible_os_family == "RedHat"
+    notify: nginx systemd
+  - name: Install nginx on Ubuntu
+    apt:
+     name=nginx
+     state=latest
+    when:
+     ansible_os_family == "Debian"
+    notify: nginx systemd
+  - name: Install httpd on RedHat Family
+    yum:
+     name=httpd
+     state=latest
+    when:
+     ansible_os_family == "RedHat"
+  - name: Install apache2 on Ubuntu
+    apt:
+     name=apache2
+     state=latest
+    when:
+     ansible_os_family == "Debian"
+  - name: Changing httpd port on RedHat Family
+    lineinfile:
+     path: /etc/httpd/conf/httpd.conf
+     regexp: Listen 80
+     line: Listen 8080
+    when:
+     ansible_os_family == "RedHat"
+    notify: httpd systemd
+    when:
+     ansible_os_family == "RedHat"
+  - name: Changing apache2 port on Debian
+    lineinfile:
+     path: /etc/apache2/ports.conf
+     regexp: Listen 80
+     line: Listen 8080
+    when:
+     ansible_os_family == "RedHat"
+    notify: apache2 systemd
+    when:
+     ansible_os_family == "Debian"  
+  handlers:
+   - name: httpd systemd
+     systemd:
+      name: httpd
+      enabled: true
+      state: started
+   - name: apache2 systemd
+     systemd:
+      name: apache2
+      enabled: true
+      state: started
+   - name: nginx systemd
+     systemd:
+      name: nginx
+      enabled: true
+      state: started
