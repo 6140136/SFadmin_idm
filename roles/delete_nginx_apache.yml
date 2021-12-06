@@ -1,0 +1,17 @@
+---
+
+- hosts: all
+  become: yes
+  tasks:
+  -  name: Remove nginx httpd packages on RedHat
+     yum: 
+        name=nginx,httpd
+        state=absent
+     when:
+        ansible_os_family == "RedHat"
+  -  name: Remove nginx apache2 on Ubuntu  
+     apt:
+        name=nginx,apache2
+        state=absent
+     when:
+        ansible_os_family == "Debian"
